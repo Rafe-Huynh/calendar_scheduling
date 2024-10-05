@@ -11,6 +11,7 @@ import { Button } from './ui/button';
 import logo from '../public/assets/logo.png'
 import Image from 'next/image';
 import { signIn } from '../lib/auth';
+import GoogleSubmit from './SubmitButtons';
 const AuthModal = () => {
   return (
     <Dialog>
@@ -24,7 +25,7 @@ const AuthModal = () => {
             Calendar <span className="text-primary">Scheduler</span>
           </h4>
         </DialogHeader>
-        {/* {/* <div className="flex flex-col gap-3 mt-5">
+        <div className="flex flex-col gap-3 mt-5">
           <form
             className="w-full"
             action={async () => {
@@ -32,19 +33,9 @@ const AuthModal = () => {
               await signIn("google");
             }}
           >
-            {/* <GoogleAuthButton />
+            <GoogleSubmit />
           </form>
-
-          <form
-            className="w-full"
-            action={async () => {
-              "use server";
-              await signIn("github");
-            }}
-          >
-            <GitHubAuthButton />
-          </form> */}
-        {/* </div> */}
+        </div>
       </DialogContent>
     </Dialog>
 
