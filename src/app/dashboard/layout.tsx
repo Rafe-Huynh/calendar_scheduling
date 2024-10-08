@@ -3,6 +3,10 @@ import Link from 'next/link'
 import React, { ReactNode } from 'react'
 import logo from '../public/assets/logo.png'
 import DashboardLinks from '../components/DashboardLinks'
+import { Sheet, SheetContent, SheetTrigger } from '../components/ui/sheet'
+import { Button } from '../components/ui/button'
+import { MenuIcon } from 'lucide-react'
+import { ThemeToggle } from '../components/ThemeToggle'
 const dashboardLayout = ({children} : {
  children: ReactNode
 }) => {
@@ -26,7 +30,21 @@ const dashboardLayout = ({children} : {
         </div>
         <div className='flex flex-col '>
             <header className='flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6'>
-                
+                <Sheet>
+                    <SheetTrigger asChild>
+                        <Button className='md:hidden shrink-0' size="icon" variant="outline" >
+                            <MenuIcon />
+                        </Button>
+                        <SheetContent side="left" className='flex flex-col'>
+                            <nav className='grid gap-2 mt-10'>
+                                <DashboardLinks />
+                            </nav>
+                        </SheetContent>
+                    </SheetTrigger>
+                </Sheet>
+                <div className='ml-auto flex items-center gap-x-4'>
+                    <ThemeToggle />
+                </div>
             </header>
 
         </div>
