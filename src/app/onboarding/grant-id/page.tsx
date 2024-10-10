@@ -15,7 +15,7 @@ const OnboardingRouteTwo = () => {
             <Image src={success} alt="success" className='w-full'/>
             <CardContent>
                 <Button asChild className='w-full'>
-                    <Link href="/">
+                    <Link href="/api/auth">
                     <CalendarCheck2 /> 
                         Connect Calendar
                     </Link>

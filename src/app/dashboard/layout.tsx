@@ -19,11 +19,15 @@ async function getData(userId: string) {
       id: userId
     },
     select: {
-      username: true
+      username: true,
+      grantId: true
     }
   })
   if(!data?.username){
     redirect("/onboarding")
+  }
+  if(!data?.grantId){
+    redirect("/onboarding/grant-id")
   }
   return data
 }
