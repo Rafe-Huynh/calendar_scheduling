@@ -4,6 +4,7 @@ import prisma from "./lib/db"
 import { requireUser } from "./lib/hooks"
 import {parseWithZod} from '@conform-to/zod'
 import {onboardingSchemaValidation } from "./lib/zodSchemas"
+import { redirect } from "next/navigation"
 export async function OnboardingAction(prevState:any, formData: FormData) {
     const user = await requireUser()
     const submission = await parseWithZod(formData, {
@@ -32,4 +33,5 @@ export async function OnboardingAction(prevState:any, formData: FormData) {
         },
 
     })
+    return redirect('/dashboard')
 }
