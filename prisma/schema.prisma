@@ -22,6 +22,7 @@ model User {
   username      String?        @unique
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
+  Availability Availability[]
 }
 model Account {
   id                 String  @id @default(cuid())
@@ -61,4 +62,24 @@ model VerificationToken {
  
   @@unique([identifier, token])
   @@map("verification_tokens")
+}
+model Availability {
+  id String @id @default(uuid())
+  day Day 
+  fromTime String
+  tillTime String
+  isActive Boolean @default(true)
+  User   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+enum Day{
+  Monday
+  Tuesday
+  Wednesday
+  Thursday
+  Friday
+  Saturday
+  Sunday
 }

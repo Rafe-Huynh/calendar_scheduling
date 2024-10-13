@@ -5,6 +5,7 @@ import { requireUser } from "./lib/hooks"
 import {parseWithZod} from '@conform-to/zod'
 import {onboardingSchemaValidation, settingsSchema } from "./lib/zodSchemas"
 import { redirect } from "next/navigation"
+
 export async function OnboardingAction(prevState:any, formData: FormData) {
     const user = await requireUser()
     const submission = await parseWithZod(formData, {
@@ -29,7 +30,48 @@ export async function OnboardingAction(prevState:any, formData: FormData) {
         },
         data: {
             username: submission.value.userName,
-            name: submission.value.fullName
+            name: submission.value.fullName,
+            Availability: {
+                createMany: {
+                    data: [
+                        {
+                            day: 'Monday',
+                            fromTime: '8:00',
+                            tillTime: '18:00'
+                        },
+                        {
+                            day: "Tuesday",
+                            fromTime: "08:00",
+                            tillTime: "18:00",
+                          },
+                          {
+                            day: "Wednesday",
+                            fromTime: "08:00",
+                            tillTime: "18:00",
+                          },
+                          {
+                            day: "Thursday",
+                            fromTime: "08:00",
+                            tillTime: "18:00",
+                          },
+                          {
+                            day: "Friday",
+                            fromTime: "08:00",
+                            tillTime: "18:00",
+                          },
+                          {
+                            day: "Saturday",
+                            fromTime: "08:00",
+                            tillTime: "18:00",
+                          },
+                          {
+                            day: "Sunday",
+                            fromTime: "08:00",
+                            tillTime: "18:00",
+                          },
+                    ]
+                }
+            }
         },
 
     })

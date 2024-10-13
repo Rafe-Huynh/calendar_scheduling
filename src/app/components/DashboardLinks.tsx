@@ -14,7 +14,7 @@ export const dashboardLink: dashboardProps[]= [
     {
         id:0,
         name: 'Event Types',
-        href: '/dasgboard',
+        href: '/dashboard',
         icon: HomeIcon,
     },
     {
