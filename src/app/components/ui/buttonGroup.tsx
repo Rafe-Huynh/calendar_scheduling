@@ -1,28 +1,38 @@
-'use client'
-import { cn } from "@/lib/utils";
-import { Children, cloneElement, ReactElement } from "react";
-interface buttonProps{
-    classname?: string
-    children: ReactElement<buttonProps>[]
+"use client";
 
+import { Children, ReactElement, cloneElement } from "react";
+import { cn } from "@/lib/utils";
+import { ButtonProps } from "./button";
+
+interface ButtonGroupProps {
+  className?: string;
+  children: ReactElement<ButtonProps>[];
 }
-export function ButtonGroup({classname, children}: buttonProps) {
-    const totalButton = Children.count(children)
-    return (
-        <div className={cn("flex w-full", classname)}>
-            {children.map((child, index) => {
-                const isFirstItem = index === 0
-                const isLastItem = index === totalButton - 1
-                return cloneElement(child, {
-                    classname: cn(
-                        {
-                            "rounded-l-none": !isFirstItem,
-                            "rounded-r-none": !isLastItem,
-                            "border-l-0": !isFirstItem
-                        }, child.props.classname
-                    )
-                })
-            })}
-        </div>
-    )
-}
+
+export const ButtonGroup = ({
+  className,
+
+  children,
+}: ButtonGroupProps) => {
+  const totalButtons = Children.count(children);
+
+  return (
+    <div className={cn("flex w-full", className)}>
+      {Children.map(children, (child, index) => {
+        const isFirst = index === 0;
+        const isLast = index === totalButtons - 1;
+
+        return cloneElement(child, {
+          className: cn(
+            {
+              "rounded-l-none": !isFirst,
+              "rounded-r-none": !isLast,
+              "border-l-0": !isFirst,
+            },
+            child.props.className
+          ),
+        });
+      })}
+    </div>
+  );
+};

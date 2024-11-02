@@ -7,9 +7,10 @@ import EmptyState from '../components/EmptyState'
 import { Button } from '../components/ui/button'
 import Link from 'next/link'
 import { ExternalLink, Link2, Pen, Settings, Trash, User2 } from 'lucide-react'
-import { Switch } from '@radix-ui/react-switch'
+
 import { ButtonGroup } from '../components/ui/buttonGroup'
 import { DropdownMenuTrigger,DropdownMenu, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuGroup, DropdownMenuItem } from '../components/ui/dropdown-menu'
+import { Switch } from '../components/ui/switch'
 async function getData(userId: string) {
   const data = await prisma.user.findUnique({
     where:{
@@ -69,7 +70,7 @@ const Dashboard = async () => {
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="outline" size="icon">
-                        <Settings size={4}/>
+                        <Settings className='size-4'/>
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align='end'>
@@ -80,22 +81,22 @@ const Dashboard = async () => {
                       <DropdownMenuGroup>
                         <DropdownMenuItem asChild>
                           <Link href={`/${data.username}/${item.url}`}>
-                          <ExternalLink className="mr-2"size={4}/>
+                          <ExternalLink className="mr-2 size-4"/>
                           Preview
                           </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem>
-                          <Link2 className="mr-2"size={4}/>
+                          <Link2 className="mr-2 size-4"/>
                           Copy
                         </DropdownMenuItem>
                         <DropdownMenuItem>
-                          <Pen className="mr-2"size={4}/>
+                          <Pen className="mr-2 size-4"/>
                           Edit
                         </DropdownMenuItem>
                       </DropdownMenuGroup>
                       <DropdownMenuSeparator/>
                       <DropdownMenuItem>
-                          <Trash className="mr-2"size={4}/>
+                          <Trash className="mr-2 size-4"/>
                           Delete
                         </DropdownMenuItem>
                     </DropdownMenuContent>
@@ -103,7 +104,7 @@ const Dashboard = async () => {
                   </div>
                 <Link href="/" className='flex items-center'>
                 <div className='flex-shrink-0'>
-                  <User2 size={6}/>
+                  <User2 className='size-6'/>
                 </div>
                 <div className='ml-5 w-0 flex-1'>
                   <dl>

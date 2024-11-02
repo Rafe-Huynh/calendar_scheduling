@@ -145,7 +145,7 @@ export async function createEvent(prev: any, formData: FormData) {
             url: submission.value.url,
             description: submission.value.description,
             videoCallSoftware: submission.value.videoCallSoftware,
-            userId: session.user?.id
+            userId: session.user?.id as string
         }
     })
     return redirect("/dashboard")

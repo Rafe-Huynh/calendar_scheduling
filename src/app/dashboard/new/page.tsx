@@ -6,6 +6,7 @@ import { ButtonGroup } from "@/app/components/ui/buttonGroup";
 import {
   Card,
   CardContent,
+  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -21,113 +22,152 @@ import { SelectLabel } from "@radix-ui/react-select";
 import Link from "next/link";
 import React, { useState } from "react";
 import { useFormState } from "react-dom";
-type VideoCallProvider = "Zoom Meeting" | "Google Meet" | "Microsoft Team"
+
+type Platform = "Zoom Meeting" | "Google Meet" | "Microsoft Teams";
 
 const NewEvent = () => {
-    const [active, setActive] = useState<VideoCallProvider>("Google Meet")
-    const [lastResult, action] = useFormState(createEvent, undefined)
-    const [form, fields] = useForm({lastResult, 
-        onValidate({formData}){
-            return parseWithZod(formData,{
-                schema: eventTypeSchema
-            })
-        },
-    shouldRevalidate: "onBlur",
-    shouldValidate: "onInput"
-    })
+  const [lastResult, action] = useFormState(createEvent, undefined);
+  const [form, fields] = useForm({
+    // Sync the result of last submission
+    lastResult,
+
+    // Reuse the validation logic on the client
+    onValidate({ formData }) {
+      return parseWithZod(formData, { schema: eventTypeSchema });
+    },
+
+    // Validate the form on blur event triggered
+    shouldValidate: "onBlur",
+    shouldRevalidate: "onInput",
+  });
+  const [activePlatform, setActivePlatform] = useState<Platform>("Google Meet");
+
+  const togglePlatform = (platform: Platform) => {
+    setActivePlatform(platform);
+  };
   return (
-    <div className="w-full h-full flex flex-1 items-center">
+    <div className="h-full w-full flex-1 flex flex-col items-center justify-center">
       <Card>
         <CardHeader>
-          <CardTitle>Add New Event</CardTitle>
+          <CardTitle>Add new appointment type</CardTitle>
         </CardHeader>
-        <form id={form.id} onSubmit={form.onSubmit} action={action} noValidate>
+        <form noValidate id={form.id} onSubmit={form.onSubmit} action={action}>
           <CardContent className="grid gap-y-5">
             <div className="flex flex-col gap-y-2">
               <Label>Title</Label>
-              <Input placeholder="30 Minute meeting" name={fields.title.name} key={fields.title.key} defaultValue={fields.title.initialValue}/>
-              <p className="text-red-500 text-sm">
-                {fields.title.errors}
-              </p>
+              <Input
+                name={fields.title.name}
+                key={fields.title.key}
+                defaultValue={fields.title.initialValue}
+                placeholder="30 min meeting"
+              />
+              <p className="text-red-500 text-sm">{fields.title.errors}</p>
             </div>
-            <div className="flex flex-col gap-y-2">
-              <Label>URL Link</Label>
+
+            <div className="grid gap-y-2 ">
+              <Label>URL Slug</Label>
               <div className="flex rounded-md">
-                <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-muted bg-muted text-sm text-muted-foreground">
-                  CalScheduler.com/
+                <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-muted bg-muted text-muted-foreground text-sm">
+                  CalMarshal.com/
                 </span>
-                <Input className="rounded-l-none" placeholder="" name={fields.url.name} key={fields.url.key} defaultValue={fields.url.initialValue}/>
-                <p className="text-red-500 text-sm">
-                {fields.url.errors}
-              </p>
+                <Input
+                  type="text"
+                  key={fields.url.key}
+                  defaultValue={fields.url.initialValue}
+                  name={fields.url.name}
+                  placeholder="example-user-1"
+                  className="rounded-l-none"
+                />
               </div>
+
+              <p className="text-red-500 text-sm">{fields.url.errors}</p>
             </div>
-            <div className="flex flex-col gap-y-2">
-                <Label>
-                    Description
-                </Label>
-                <Textarea placeholder="message..." name={fields.description.name} key={fields.description.key} defaultValue={fields.description.initialValue}/>
-                <p className="text-red-500 text-sm">
+
+            <div className="grid gap-y-2">
+              <Label>Description</Label>
+              <Textarea
+                name={fields.description.name}
+                key={fields.description.key}
+                defaultValue={fields.description.initialValue}
+                placeholder="30 min meeting"
+              />
+              <p className="text-red-500 text-sm">
                 {fields.description.errors}
               </p>
             </div>
-            <div className="flex flex-col gap-y-2">
-                <Label>
-                    Duration
-                </Label>
-                <Select name={fields.duration.name} key={fields.duration.key} defaultValue={fields.duration.initialValue}>
-                    <SelectTrigger>
-                        <SelectValue placeholder="Select duration"/>
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectGroup>
-                            <SelectLabel>
-                                Duration
-                            </SelectLabel>
-                            <SelectItem value={"15"}>
-                                15 Mins
-                            </SelectItem>
-                            <SelectItem value={"30"}>
-                                30 Mins
-                            </SelectItem>
-                            <SelectItem value={"45"}>
-                                45 Mins
-                            </SelectItem>
-                            <SelectItem value={"60"}>
-                                60 Mins
-                            </SelectItem>
-                        </SelectGroup>
-                    </SelectContent>
-                    <p className="text-red-500 text-sm">
-                {fields.duration.errors}
-              </p>
-                </Select>
-            </div>
+
             <div className="grid gap-y-2">
-                <Label>
-                    Video Call Provider
-                </Label>
-                <Input type="hidden" name={fields.videoCallSoftware.name} key={fields.videoCallSoftware.key} defaultValue={fields.videoCallSoftware.initialValue}/>
-                <ButtonGroup>
-                    <Button onClick={() => setActive("Zoom Meeting")} className="w-full" variant={active === "Zoom Meeting" ? "secondary" : "outline"}>
-                        Zoom
-                    </Button>
-                    <Button onClick={() => setActive("Google Meet")}className="w-full" variant={active === "Google Meet" ? "secondary" : "outline"}>
-                        Google Meet
-                    </Button>
-                    <Button onClick={() => setActive("Microsoft Team")} className="w-full" variant={active === "Microsoft Team" ? "secondary" : "outline"}>
-                        Microsoft Team
-                    </Button>
-                </ButtonGroup>
+              <Label>Duration</Label>
+              <Select
+                name={fields.duration.name}
+                key={fields.duration.key}
+                defaultValue={fields.duration.initialValue}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select the duration" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectLabel>Duration</SelectLabel>
+                    <SelectItem value="15">15 Mins</SelectItem>
+                    <SelectItem value="30">30 Min</SelectItem>
+                    <SelectItem value="45">45 Mins</SelectItem>
+                    <SelectItem value="60">1 Hour</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+
+              <p className="text-red-500 text-sm">{fields.duration.errors}</p>
+            </div>
+
+            <div className="grid gap-y-2">
+              <input
+                type="hidden"
+                name={fields.videoCallSoftware.name}
+                value={activePlatform}
+              />
+              <Label>Video Call Provider</Label>
+              <ButtonGroup className="w-full">
+                <Button
+                  onClick={() => togglePlatform("Zoom Meeting")}
+                  type="button"
+                  className="w-full"
+                  variant={
+                    activePlatform === "Zoom Meeting" ? "secondary" : "outline"
+                  }
+                >
+                  Zoom
+                </Button>
+                <Button
+                  onClick={() => togglePlatform("Google Meet")}
+                  type="button"
+                  className="w-full"
+                  variant={
+                    activePlatform === "Google Meet" ? "secondary" : "outline"
+                  }
+                >
+                  Google Meet
+                </Button>
+                <Button
+                  variant={
+                    activePlatform === "Microsoft Teams"
+                      ? "secondary"
+                      : "outline"
+                  }
+                  type="button"
+                  className="w-full"
+                  onClick={() => togglePlatform("Microsoft Teams")}
+                >
+                  Microsoft Teams
+                </Button>
+              </ButtonGroup>
             </div>
           </CardContent>
           <CardFooter className="w-full flex justify-between">
-            <Button variant="destructive" asChild>
-                <Link href="/dashboard">
-                Cancel
-                </Link>
+            <Button asChild variant="destructive">
+              <Link href="/dashboard">Cancel</Link>
             </Button>
-            <SubmitButton text="Submit"/>
+            <SubmitButton text="Create Event" />
           </CardFooter>
         </form>
       </Card>
