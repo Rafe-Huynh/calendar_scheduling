@@ -1,6 +1,8 @@
+import Calendar from '@/app/components/bookForm/Calendar'
 import { Card, CardContent } from '@/app/components/ui/card'
 import prisma from '@/app/lib/db'
 import { requireUser } from '@/app/lib/hooks'
+import { Separator } from '@radix-ui/react-dropdown-menu'
 import { CalendarX2, Clock, VideoIcon } from 'lucide-react'
 import { notFound } from 'next/navigation'
 import React from 'react'
@@ -68,6 +70,8 @@ const Booking = async ({params} : {params:{usename:string; eventUrl: string}}) =
                         </p>
                     </div>
                 </div>
+                <Separator />
+                <Calendar />
             </CardContent>
 
         </Card>
