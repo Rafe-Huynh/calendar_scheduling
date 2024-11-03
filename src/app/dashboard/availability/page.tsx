@@ -10,12 +10,13 @@ import {
     SelectTrigger,
     SelectValue,
   } from "@/app/components/ui/select"
-import { Switch } from '@radix-ui/react-switch'
+
 import { SelectGroup } from '@radix-ui/react-select'
 import { times } from '@/app/lib/times'
 import { SubmitButton } from '@/app/components/SubmitButtons'
 import prisma from '@/app/lib/db'
 import { updateAvailability } from '@/app/actions'
+import { Switch } from '@/app/components/ui/switch'
 async function getData(userId: string) {
     const data = await prisma.availability.findMany({
       where: {

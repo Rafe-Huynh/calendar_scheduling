@@ -1,4 +1,5 @@
 import Calendar from '@/app/components/bookForm/Calendar'
+import RenderCalendar from '@/app/components/bookForm/RenderCalendar'
 import { Card, CardContent } from '@/app/components/ui/card'
 import prisma from '@/app/lib/db'
 import { requireUser } from '@/app/lib/hooks'
@@ -71,7 +72,7 @@ const Booking = async ({params} : {params:{usename:string; eventUrl: string}}) =
                     </div>
                 </div>
                 <Separator />
-                <Calendar />
+                <RenderCalendar availability = {data.user?.Availability as any}/>
             </CardContent>
 
         </Card>
