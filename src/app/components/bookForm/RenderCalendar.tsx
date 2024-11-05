@@ -19,8 +19,8 @@ const RenderCalendar = ({availability}: availabilityCalendarProps) => {
   })
   useEffect(() => {
     const dateParam = searchParams.get('date')
-    if (!dateParam){
-      setDate(parseDate(dateParam as string))
+    if (dateParam){
+      setDate(parseDate(dateParam))
     }
   }, [searchParams])
   const handleChange = (date: DateValue) => {

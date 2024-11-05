@@ -1,9 +1,11 @@
+
 import Calendar from '@/app/components/bookForm/Calendar'
 import RenderCalendar from '@/app/components/bookForm/RenderCalendar'
+import TimeTable from '@/app/components/bookForm/TimeTable'
 import { Card, CardContent } from '@/app/components/ui/card'
 import prisma from '@/app/lib/db'
 import { requireUser } from '@/app/lib/hooks'
-import { Separator } from '@radix-ui/react-dropdown-menu'
+import { Separator } from '@radix-ui/react-select'
 import { CalendarX2, Clock, VideoIcon } from 'lucide-react'
 import { notFound } from 'next/navigation'
 import React from 'react'
@@ -42,9 +44,15 @@ async function getData(eventUrl: string, userName: string) {
     }
     return data
 }
-const Booking = async ({params} : {params:{usename:string; eventUrl: string}}) => {
+const Booking = async ({params, searchParams} : {params:{usename:string; eventUrl: string}, searchParams:{date?: string}}) => {
     
     const data = await getData(params.eventUrl, params.usename)
+    const selectedDate = searchParams.date? new Date(searchParams.date) : new Date()
+    const formattedDate = new Intl.DateTimeFormat("en-US", {
+        weekday: "long",
+        day: 'numeric',
+        month: 'long',
+    }).format(selectedDate)
   return (
     <div className='min-h-screen w-screen flex items-center justify-center'>
         <Card className="max-w-[1000px] w-sull mx-auto">
@@ -59,7 +67,9 @@ const Booking = async ({params} : {params:{usename:string; eventUrl: string}}) =
                     <div className='mt-5 flex flex-col gap-y-3'>
                         <p className='flex items-center'>
                             <CalendarX2 className='size-4 mr-2 text-primary text-sm font-medium' />
-
+                            <span className='text-sm font-medium text-muted-foreground'>
+                                {formattedDate}
+                            </span>
                         </p>
                         <p className='flex items-center'>
                             <Clock className='size-4 mr-2 text-primary text-sm font-medium' />
@@ -71,8 +81,10 @@ const Booking = async ({params} : {params:{usename:string; eventUrl: string}}) =
                         </p>
                     </div>
                 </div>
-                <Separator />
+                <Separator  className='hidden md:block h-full w-[1px]'/>
                 <RenderCalendar availability = {data.user?.Availability as any}/>
+                <Separator  className='hidden md:block h-full w-[1px]'/>
+                <TimeTable selectedDate={selectedDate} userName={params.usename}/>
             </CardContent>
 
         </Card>
