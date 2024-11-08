@@ -1,3 +1,4 @@
+
 import {
     addMinutes,
     format,
@@ -23,98 +24,98 @@ import { Button } from "../ui/button";
   
   async function getAvailability(selectedDate: Date, userName: string) {
     const currentDay = format(selectedDate, "EEEE");
-  
-    const startOfDay = new Date(selectedDate);
-    startOfDay.setHours(0, 0, 0, 0);
-    const endOfDay = new Date(selectedDate);
-    endOfDay.setHours(23, 59, 59, 999);
-    const data = await prisma.availability.findFirst({
-      where: {
-        day: currentDay as Prisma.EnumDayFilter,
-        User: {
-          username: userName,
-        },
+
+  const startOfDay = new Date(selectedDate);
+  startOfDay.setHours(0, 0, 0, 0);
+  const endOfDay = new Date(selectedDate);
+  endOfDay.setHours(23, 59, 59, 999);
+  const data = await prisma.availability.findFirst({
+    where: {
+      day: currentDay as Prisma.EnumDayFilter,
+      User: {
+        username: userName,
       },
-      select: {
-        fromTime: true,
-        tillTime: true,
-        id: true,
-        User: {
-          select: {
-            grantEmail: true,
-            grantId: true,
-          },
-        },
-      },
-    });
-  
-    const nylasCalendarData = await nylas.calendars.getFreeBusy({
-      identifier: data?.User.grantId as string,
-      requestBody: {
-        startTime: Math.floor(startOfDay.getTime() / 1000),
-        endTime: Math.floor(endOfDay.getTime() / 1000),
-        emails: [data?.User.grantEmail as string],
-      },
-    });
-  
-    return { data, nylasCalendarData };
-  }
-  
-  function calculateAvailableTimeSlots(
-    dbAvailability: {
-      fromTime: string | undefined;
-      tillTime: string | undefined;
     },
-    nylasData: NylasResponse<GetFreeBusyResponse[]>,
-    date: string,
-    duration: number
-  ) {
-    const now = new Date(); // Get the current time
+    select: {
+      fromTime: true,
+      tillTime: true,
+      id: true,
+      User: {
+        select: {
+          grantEmail: true,
+          grantId: true,
+        },
+      },
+    },
+  });
+
+  const nylasCalendarData = await nylas.calendars.getFreeBusy({
+    identifier: data?.User.grantId as string,
+    requestBody: {
+      startTime: Math.floor(startOfDay.getTime() / 1000),
+      endTime: Math.floor(endOfDay.getTime() / 1000),
+      emails: [data?.User.grantEmail as string],
+    },
+  });
+  const token = data?.User.grantId;  // Assuming it's stored here
+console.log('Sending request with Bearer Token:', token);  // Log the token
+  return { data, nylasCalendarData };
+}
   
-    // Convert DB availability to Date objects
-    const availableFrom = parse(
-      `${date} ${dbAvailability.fromTime}`,
-      "yyyy-MM-dd HH:mm",
-      new Date()
-    );
-    const availableTill = parse(
-      `${date} ${dbAvailability.tillTime}`,
-      "yyyy-MM-dd HH:mm",
-      new Date()
-    );
-  
-    // Extract busy slots from Nylas data
-    const busySlots = nylasData.data[0].timeSlots.map((slot: any) => ({
-      start: fromUnixTime(slot.startTime),
-      end: fromUnixTime(slot.endTime),
-    }));
-  
-    // Generate all possible 30-minute slots within the available time
-    const allSlots = [];
-    let currentSlot = availableFrom;
-    while (isBefore(currentSlot, availableTill)) {
-      allSlots.push(currentSlot);
-      currentSlot = addMinutes(currentSlot, duration);
-    }
-  
-    // Filter out busy slots and slots before the current time
-    const freeSlots = allSlots.filter((slot) => {
-      const slotEnd = addMinutes(slot, duration);
-      return (
-        isAfter(slot, now) && // Ensure the slot is after the current time
-        !busySlots.some(
-          (busy: { start: any; end: any }) =>
-            (!isBefore(slot, busy.start) && isBefore(slot, busy.end)) ||
-            (isAfter(slotEnd, busy.start) && !isAfter(slotEnd, busy.end)) ||
-            (isBefore(slot, busy.start) && isAfter(slotEnd, busy.end))
-        )
-      );
-    });
-  
-    // Format the free slots
-    return freeSlots.map((slot) => format(slot, "HH:mm"));
+function calculateAvailableTimeSlots(
+  dbAvailability: {
+    fromTime: string | undefined;
+    tillTime: string | undefined;
+  },
+  nylasData: NylasResponse<GetFreeBusyResponse[]>,
+  date: string,
+  duration: number
+) {
+  const now = new Date(); // Get the current time
+
+  // Convert DB availability to Date objects
+  const availableFrom = parse(
+    `${date} ${dbAvailability.fromTime}`,
+    "yyyy-MM-dd HH:mm",
+    new Date()
+  );
+  const availableTill = parse(
+    `${date} ${dbAvailability.tillTime}`,
+    "yyyy-MM-dd HH:mm",
+    new Date()
+  );
+
+  // Extract busy slots from Nylas data
+  const busySlots = nylasData.data[0].timeSlots.map((slot: any) => ({
+    start: fromUnixTime(slot.startTime),
+    end: fromUnixTime(slot.endTime),
+  }));
+
+  // Generate all possible 30-minute slots within the available time
+  const allSlots = [];
+  let currentSlot = availableFrom;
+  while (isBefore(currentSlot, availableTill)) {
+    allSlots.push(currentSlot);
+    currentSlot = addMinutes(currentSlot, duration);
   }
-  
+
+  // Filter out busy slots and slots before the current time
+  const freeSlots = allSlots.filter((slot) => {
+    const slotEnd = addMinutes(slot, duration);
+    return (
+      isAfter(slot, now) && // Ensure the slot is after the current time
+      !busySlots.some(
+        (busy: { start: any; end: any }) =>
+          (!isBefore(slot, busy.start) && isBefore(slot, busy.end)) ||
+          (isAfter(slotEnd, busy.start) && !isAfter(slotEnd, busy.end)) ||
+          (isBefore(slot, busy.start) && isAfter(slotEnd, busy.end))
+      )
+    );
+  });
+
+  // Format the free slots
+  return freeSlots.map((slot) => format(slot, "HH:mm"));
+}
   const TimeTable = async ({
     selectedDate,
     userName,
